@@ -335,13 +335,13 @@ public class ConciliatorV2 {
                         if (v.charAt(v.length() - 1) == '0') {
                             v = v.substring(0, v.length() - 1);
                         }
-                        System.out.println(checkPair.get(i).entry.content);
+                       // System.out.println(checkPair.get(i).entry.content);
                         //Soma os valores dos lancamentos para comparar com o valor total do extrato bancario 
                         for (int j = 0; j < checkPair.get(i).pair.size(); j++) {
                             String[] entryContentG = checkPair.get(i).pair.get(j).content.split(" ");
                             String v1 = entryContentG[entryContentG.length - 3];
                             checkSum = checkSum + round(Double.parseDouble(v1), 2);
-                            System.out.println(checkPair.get(i).pair.get(j).content);
+                       //     System.out.println(checkPair.get(i).pair.get(j).content);
                         }
                         if (v.equals(Double.toString(round(checkSum, 2)))) {
                             //verifica se algum pagamento voltou 
@@ -357,8 +357,8 @@ public class ConciliatorV2 {
                                         vC = vC.substring(0, vC.length() - 1);
                                     }
                                     if (vC.equals(v1) && entryContentG[1].equals(entryContentC[0])) {
-                                        System.out.println("v1 " + v1);
-                                        System.out.println("vC " + vC);
+                                       // System.out.println("v1 " + v1);
+                                     //   System.out.println("vC " + vC);
                                         Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
                                         f1.setColor(BaseColor.RED);
                                         p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) BAIXADO(S) COM POSSIVEL DEVOLUCAO DE VALOR", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
@@ -375,7 +375,7 @@ public class ConciliatorV2 {
 
                             }//for (int j = 0; j < checkPair.get(i).pair.size(); j++)
 
-                            System.out.println("TRUE");
+                           // System.out.println("TRUE");
                             ///////////////////////////////////////////////////    
                             // caso de cheque baixado com diferenca de valor //
                             ///////////////////////////////////////////////////
@@ -400,7 +400,7 @@ public class ConciliatorV2 {
                                 document.add(p);
                             } else {
                                 dif = dif.replace("-", "");
-                                System.out.println("Dif: " + dif);
+                               // System.out.println("Dif: " + dif);
                                 for (int k = 0; k < c.creditEntry.size(); k++) {
                                     String[] entryContentC = c.creditEntry.get(k).content.split(" ");
                                     String vC = entryContentC[entryContentC.length - 2].replace(".", "");
@@ -408,8 +408,8 @@ public class ConciliatorV2 {
                                     if (vC.charAt(vC.length() - 1) == '0') {
                                         vC = vC.substring(0, vC.length() - 1);
                                     }
-                                    System.out.println("vC: " + vC);
-                                    System.out.println("entryContent[1]: " + entryContent[1] + " entryContentC[0]: " + entryContentC[0]);
+                                 //   System.out.println("vC: " + vC);
+                                //    System.out.println("entryContent[1]: " + entryContent[1] + " entryContentC[0]: " + entryContentC[0]);
                                     if (vC.equals(dif) && entryContent[0].equals(entryContentC[0])) {
                                         Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
                                         f1.setColor(BaseColor.RED);
@@ -429,7 +429,7 @@ public class ConciliatorV2 {
 
                             }
 
-                            System.out.println("FALSE");
+                         //   System.out.println("FALSE");
                         }
                         // cheque nao baixado ou baixado na data errada    
                     } else if (checkPair.get(i).entry.errorType == 1) {
@@ -468,11 +468,32 @@ public class ConciliatorV2 {
                     }
                 }
 
-                
-
-                /////////////////////////////////////////////
-                ///////      Verifica os cheques    ////////
-                ///////////////////////////////////////////
+            /////////////////////////////////////////////
+            ///////      Verifica os cheques    ////////
+            ///////////////////////////////////////////
+            
+            /////////////////////////////////////////////
+            ///////     Verifica os salarios    ////////
+            ///////////////////////////////////////////
+            double[] wageDif = {0.0, 0.0};
+            double[] wage = {0.0, 0.0};
+            ArrayList<EntryPair> w=null;
+            
+            wageFinder(g, c, wageDif, wage, w);
+            
+            System.out.println("wage: "+wage[0]);
+            System.out.println("wageDif: "+wageDif[0]);
+            
+            for(int i = 0; i<w.size();i++){
+            }
+            
+            
+            
+            /////////////////////////////////////////////
+            ///////     Verifica os salarios    ////////
+            ///////////////////////////////////////////
+            
+            
             } catch (DocumentException de) {
                 System.err.println(de.getMessage());
             } catch (IOException ioe) {
