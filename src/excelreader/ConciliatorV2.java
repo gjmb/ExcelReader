@@ -130,14 +130,16 @@ public class ConciliatorV2 {
                 if (Integer.parseInt(dt[0]) <= 10) {
                     dtW = dt;
                     w = entryContent;
-                    wage[0] = wage[0] + round(Double.parseDouble(v), 2);
+                    wage[0] = round(round(wage[0],2) + round(Double.parseDouble(v), 2),2);
                 } else {
                     dtA = dt;
                     a = entryContent;
-                    wage[1] = wage[1] + round(Double.parseDouble(v), 2);
+                    wage[1] = round(round(wage[1],2) + round(Double.parseDouble(v), 2),2);
                 }
             } // if l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")
         } // for int i = 0; i < c.debitEntry.size(); i++
+        if(w==null)
+            return;
         w[w.length - 2] = Double.toString(wage[0]);
         a[a.length - 2] = Double.toString(wage[1]);
         String wContent = "";
@@ -156,13 +158,12 @@ public class ConciliatorV2 {
     public static void wageFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
         String[] dtW = null;
         String[] dtA = null;
-        p = new ArrayList<>();
-        wageTotal(c, wage, dtW, dtA, p);
+       
         //Busca por pagamentos individuais 
         for (int i = 0; i < g.debitEntry.size(); i++) {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContentG);
-            if (l.contains("SALDO") && l.contains("00000167")) {
+            if (l.contains("SALDO") && l.contains("00000167") && g.debitEntry.get(i).errorType==-1) {
                 String vG = entryContentG[entryContentG.length - 3];
                 for (Entry debitEntry : c.debitEntry) {
                     String[] entryContent = debitEntry.content.split(" ");
@@ -180,30 +181,46 @@ public class ConciliatorV2 {
                             e.errorType = 0;
                             ep.pair.add(e);
                             p.add(ep);
-                            c.debitEntry.remove(debitEntry);
+                            g.debitEntry.get(i).errorType=0;
+                            debitEntry.errorType=0;
                             break;
                         }
                     }// if vG.equals(v)   
                 }// for Entry debitEntry : c.debitEntry
             }//if l.contains("SALDO") && l.contains("00000167")
         } // for (int i = 0; i < g.debitEntry.size(); i++)  
-
-        EntryPair ep = p.get(0);
+        wageTotal(c, wage, dtW, dtA, p);
+        if(p.size()==0)
+            return;
+        if(wage[0]==0.0){
+            p.removeAll(p);
+            return;
+        }
+        EntryPair ep=null;
+        if(p.size()==1)
+        ep = p.get(0);
+        else
+        ep=p.get(1);
         ep.entry.errorType = 0;
         String[] entryContent = ep.entry.content.split(" ");
-        double sum = round(Double.parseDouble(entryContent[entryContent.length - 2]), 2);
+        String v = entryContent[entryContent.length - 2].replace(".", "");
+                    v = v.replace(",", ".");
+                    if (v.charAt(v.length() - 1) == '0') {
+                        v = v.substring(0, v.length() - 1);
+                    }
+        double sum = round(Double.parseDouble(v), 2);
         for (int i = 0; i < g.debitEntry.size(); i++) {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContentG);
-            if (l.contains("SALDO") && l.contains("00000167")) {
+            if (l.contains("SALDO") && l.contains("00000167")&& g.debitEntry.get(i).errorType==-1) {
                 String vG = entryContentG[entryContentG.length - 3];
-                wageDif[0] = wageDif[0] + round(Double.parseDouble(vG), 2);
+                wageDif[0] = round(round(wageDif[0],2) + round(Double.parseDouble(vG), 2),2);
                 Entry e = new Entry(g.debitEntry.get(i).content);
                 e.errorType = 0;
                 ep.pair.add(e);
             }
         }// for (int i = 0; i < g.debitEntry.size(); i++)
-        wageDif[0] = wageDif[0] - round(sum, 2);
+        wageDif[0] = round(round(wageDif[0],2) - round(sum, 2),2);
     }// public static void wageFinder
     //TODO: TESTAR wageFinder
 
@@ -477,7 +494,7 @@ public class ConciliatorV2 {
             ///////////////////////////////////////////
             double[] wageDif = {0.0, 0.0};
             double[] wage = {0.0, 0.0};
-            ArrayList<EntryPair> w=null;
+            ArrayList<EntryPair> w=new ArrayList<>();
             
             wageFinder(g, c, wageDif, wage, w);
             
@@ -487,7 +504,7 @@ public class ConciliatorV2 {
             for(int i = 0; i<w.size();i++){
                System.out.println(w.get(i).entry.content);
                 for (int j = 0; j < w.get(i).pair.size(); j++) {
-                           System.out.println(w.get(i).pair.get(j).content);
+                           System.out.println("     "+w.get(i).pair.get(j).content);
                         }               
             }
             
