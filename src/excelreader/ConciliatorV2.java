@@ -482,10 +482,15 @@ public class ConciliatorV2 {
             wageFinder(g, c, wageDif, wage, w);
             
             System.out.println("wage: "+wage[0]);
-            System.out.println("wageDif: "+wageDif[0]);
+            System.out.println("wageDif:  "+wageDif[0]);
             
             for(int i = 0; i<w.size();i++){
+               System.out.println(w.get(i).entry.content);
+                for (int j = 0; j < w.get(i).pair.size(); j++) {
+                           System.out.println(w.get(i).pair.get(j).content);
+                        }               
             }
+            
             
             
             
