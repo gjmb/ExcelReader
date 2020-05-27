@@ -197,6 +197,7 @@ public class ConciliatorV2 {
             return;
         }
         EntryPair ep=null;
+        //TODO: ARRUMAR
         if(p.size()==1)
         ep = p.get(0);
         else
