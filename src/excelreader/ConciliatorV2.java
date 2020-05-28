@@ -180,15 +180,14 @@ public class ConciliatorV2 {
                         if (l2.contains(entryContentG[entryContentG.length - 4])) {
                             EntryPair ep = new EntryPair(new Entry(debitEntry.content));
                             Entry e = new Entry(g.debitEntry.get(i).content);
-                            if(l2.contains(entryContentG[1])){
+                            if (l2.contains(entryContentG[1])) {
                                 ep.entry.errorType = 0;
                                 e.errorType = 0;
-                            }
-                            else{
+                            } else {
                                 ep.entry.errorType = 1;
                                 e.errorType = 1;
                             }
-                           
+
                             ep.pair.add(e);
                             p.add(ep);
                             g.debitEntry.get(i).errorType = 0;
@@ -212,11 +211,10 @@ public class ConciliatorV2 {
                         if (l2.contains(entryContentG[entryContentG.length - 4])) {
                             EntryPair ep = new EntryPair(new Entry(debitEntry.content));
                             Entry e = new Entry(g.debitEntry.get(i).content);
-                            if(l2.contains(entryContentG[1])){
+                            if (l2.contains(entryContentG[1])) {
                                 ep.entry.errorType = 0;
                                 e.errorType = 0;
-                            }
-                            else{
+                            } else {
                                 ep.entry.errorType = 1;
                                 e.errorType = 1;
                             }
@@ -231,7 +229,7 @@ public class ConciliatorV2 {
             }// else if
         } // for (int i = 0; i < g.debitEntry.size(); i++)  
         wageTotal(c, wage, dtW, dtA, p);
-        if (p.size() == 0) {
+        if (p.isEmpty()) {
             return;
         }
         if (wage[0] == 0.0) {
@@ -250,13 +248,7 @@ public class ConciliatorV2 {
             }
         }
 
-        String[] entryContent = ep.entry.content.split(" ");
-        String v = entryContent[entryContent.length - 2].replace(".", "");
-        v = v.replace(",", ".");
-        if (v.charAt(v.length() - 1) == '0') {
-            v = v.substring(0, v.length() - 1);
-        }
-        double sum = round(Double.parseDouble(v), 2);
+        
         for (int i = 0; i < g.debitEntry.size(); i++) {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContentG);
@@ -267,11 +259,66 @@ public class ConciliatorV2 {
                 ep.pair.add(e);
             }
         }// for (int i = 0; i < g.debitEntry.size(); i++)
-        wageDif[0] = round(round(wageDif[0], 2) - round(sum, 2), 2);
-        
-        for (int i = 0; i < Adv.size(); i++) 
+        wageDif[0] = round(round(wageDif[0], 2) - round(wage[0], 2), 2);
+        if (wageDif[0] == 0.0) {
+            ep.entry.errorType = 0;
+            for (int i = 0; i < ep.pair.size(); i++) {
+               String[] entryContent = ep.pair.get(i).content.split(" ");
+            
+                List<String> l = Arrays.asList(entryContent);
+                if(l.contains(dtW[0]))
+                    ep.pair.get(i).errorType = 0;
+                else{
+                    ep.pair.get(i).errorType = 1;
+                    ep.entry.errorType =1;
+                }
+                    
+            }
+
+        }
+
+        for (int i = 0; i < Adv.size(); i++) {
             p.add(Adv.get(i));
-        
+        }
+
+        for (int i = 0; i < p.size(); i++) {
+            String [] entryContent = p.get(i).entry.content.split(" ");
+            //System.out.println("dtW: " + dtW[0] + " " + p.get(i).entry.content);
+            List<String> l = Arrays.asList(entryContent);
+            if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS") && l.contains(dtA[0])) {
+                ep = p.get(i);
+                break;
+            }
+        }
+
+
+        for (int i = 0; i < g.debitEntry.size(); i++) {
+            String[] entryContentG = g.debitEntry.get(i).content.split(" ");
+            List<String> l = Arrays.asList(entryContentG);
+            if (l.contains("ADTO.") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1) {
+                String vG = entryContentG[entryContentG.length - 3];
+                wageDif[1] = round(round(wageDif[1], 2) + round(Double.parseDouble(vG), 2), 2);
+                Entry e = new Entry(g.debitEntry.get(i).content);
+                ep.pair.add(e);
+            }
+        }// for (int i = 0; i < g.debitEntry.size(); i++)
+        wageDif[1] = round(round(wageDif[1], 2) - round(wage[1], 2), 2);
+        if (wageDif[1] == 0.0) {
+            ep.entry.errorType = 0;
+            for (int i = 0; i < ep.pair.size(); i++) {
+               String[] entryContent = ep.pair.get(i).content.split(" ");
+            
+                List<String> l = Arrays.asList(entryContent);
+                if(l.contains(dtA[0]))
+                    ep.pair.get(i).errorType = 0;
+                else{
+                    ep.pair.get(i).errorType = 1;
+                    ep.entry.errorType =1;
+                }
+            }
+
+        }
+
     }// public static void wageFinder
     //TODO: TESTAR wageFinder
 
@@ -559,10 +606,14 @@ public class ConciliatorV2 {
                     //System.out.println("wageDif:  " + wageDif[0]);
                     for (int i = 0; i < w.size(); i++) {
                         System.out.println(w.get(i).entry.content);
+                        System.out.println(w.get(i).entry.errorType);
                         for (int j = 0; j < w.get(i).pair.size(); j++) {
                             System.out.println("     " + w.get(i).pair.get(j).content);
+                            System.out.println("     " + w.get(i).pair.get(j).errorType);
                         }
                     }
+                    System.out.println("wage: " + wage[1]);
+                    System.out.println("wageDif:  " + wageDif[1]);
                 }
                 /////////////////////////////////////////////
                 ///////     Verifica os salarios    ////////
