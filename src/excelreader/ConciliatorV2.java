@@ -128,11 +128,12 @@ public class ConciliatorV2 {
 
             if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")) {
                 if (Integer.parseInt(dt[0]) <= 10) {
-                    dtW = dt;
+                    dtW[0] = entryContent[0];
+                    System.out.println("dtW: " + dtW[0]);
                     w = entryContent;
                     wage[0] = round(round(wage[0],2) + round(Double.parseDouble(v), 2),2);
                 } else {
-                    dtA = dt;
+                    dtA[0] = entryContent[0];
                     a = entryContent;
                     wage[1] = round(round(wage[1],2) + round(Double.parseDouble(v), 2),2);
                 }
@@ -156,8 +157,8 @@ public class ConciliatorV2 {
     } // wageTotal
 
     public static void wageFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
-        String[] dtW = null;
-        String[] dtA = null;
+        String[] dtW = {""};
+        String[] dtA = {""};
        
         //Busca por pagamentos individuais 
         for (int i = 0; i < g.debitEntry.size(); i++) {
@@ -198,11 +199,16 @@ public class ConciliatorV2 {
         }
         EntryPair ep=null;
         //TODO: ARRUMAR 
-        if(p.size()==1)
-        ep = p.get(0);
-        else
-        ep=p.get(1);
-        ep.entry.errorType = 0;
+        for(int i = 0; i<p.size(); i++){
+            String[] entryContent = p.get(i).entry.content.split(" ");
+            System.out.println("dtW: "+ dtW[0]+ " " + p.get(i).entry.content);
+            List<String> l = Arrays.asList(entryContent);
+            if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS") && l.contains(dtW[0])){
+                ep=p.get(i);
+                break;
+            } 
+        }
+        
         String[] entryContent = ep.entry.content.split(" ");
         String v = entryContent[entryContent.length - 2].replace(".", "");
                     v = v.replace(",", ".");
