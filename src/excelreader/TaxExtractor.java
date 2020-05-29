@@ -223,6 +223,9 @@ public class TaxExtractor {
 
                                     //System.out.println(lines[j]);
                                     //resgate: valor negativo
+                                    
+                                   // TODO: VERIFICAR ESTORNO DE APLICACAO 
+                                    
                                 } else if (lineList.contains(retrieve[0]) || lineList.contains(retrieve[1]) || lineList.contains(retrieve[2])) {
                                     cond.appRescDate.add(lineSplited[0]);
                                     String v = lineSplited[lineSplited.length - 2];
