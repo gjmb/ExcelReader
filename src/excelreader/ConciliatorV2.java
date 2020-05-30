@@ -44,9 +44,7 @@ public class ConciliatorV2 {
             if (l.contains("CHEQUE")) {
                 EntryPair ep = new EntryPair(new Entry(c.debitEntry.get(i).content));
                 p.add(ep);
-                c.debitEntry.remove(c.debitEntry.get(i));
-                // System.out.println(c.name);
-                // System.out.println(ep.entry.content);
+                c.debitEntry.get(i).errorType=0;
                 for (int j = 0; j < g.debitEntry.size(); j++) {
                     String[] entryContentG = g.debitEntry.get(j).content.split(" ");
                     List<String> lG = Arrays.asList(entryContentG);
@@ -59,7 +57,7 @@ public class ConciliatorV2 {
                                 ep.pair.add(g.debitEntry.get(j));
                             } else {
                                 ep.entry.errorType = 1;
-                                g.debitEntry.get(j).errorType = 1;
+                                g.debitEntry.get(j).errorType = 0;
                                 ep.pair.add(g.debitEntry.get(j));
                             }
                         }
@@ -653,7 +651,7 @@ public class ConciliatorV2 {
                                     document.add(p);
                                 }
                             } else if (w.get(i).entry.errorType == -1 && wageDif[1] != 0 && Integer.parseInt(dt[0]) > 10 && w.get(i).pair.size()>0) {
-                                p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO SALARIO BAIXADO(S) COM DIFERENCA DE VALOR ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO. SALARIO BAIXADO(S) COM DIFERENCA DE VALOR ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 p = new Paragraph(new Phrase(lineSpacing, "               DIFERENCA: " + round(Math.abs(wageDif[1]), 2), FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
@@ -671,13 +669,13 @@ public class ConciliatorV2 {
                                     document.add(p);
                                 }
                             } else if (w.get(i).entry.errorType == -1 && (wageDif[1] == 0 || (wageDif[1] != 0 && w.get(i).pair.isEmpty())) && Integer.parseInt(dt[0]) > 10) {
-                                p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO SALARIO NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO. SALARIO NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 f1.setColor(BaseColor.RED);
                                 p = new Paragraph(new Phrase(lineSpacing, "               " + w.get(i).entry.content, f1));
                                 document.add(p);
                             } else if(w.get(i).entry.errorType == 1 && wageDif[1] == 0 && Integer.parseInt(dt[0]) > 10){
-                                 p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO SALARIO BAIXADO(S) NA DATA ERRADA ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                 p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO. SALARIO BAIXADO(S) NA DATA ERRADA ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 f1.setColor(BaseColor.RED);
                                 p = new Paragraph(new Phrase(lineSpacing, "               " + w.get(i).entry.content, f1));
