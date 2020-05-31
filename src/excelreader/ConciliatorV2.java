@@ -126,11 +126,13 @@ public class ConciliatorV2 {
 
             if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")) {
                 if (Integer.parseInt(dt[0]) <= 10) {
+                    c.debitEntry.get(i).errorType=0;
                     dtW[0] = entryContent[0];
                     //System.out.println("dtW: " + dtW[0]);
                     w = entryContent;
                     wage[0] = round(round(wage[0], 2) + round(Double.parseDouble(v), 2), 2);
                 } else {
+                    c.debitEntry.get(i).errorType=0;
                     dtA[0] = entryContent[0];
                     a = entryContent;
                     wage[1] = round(round(wage[1], 2) + round(Double.parseDouble(v), 2), 2);
@@ -250,6 +252,7 @@ public class ConciliatorV2 {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContentG);
             if (l.contains("SALDO") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1) {
+                g.debitEntry.get(i).errorType = 0;
                 String vG = entryContentG[entryContentG.length - 3];
                 wageDif[0] = round(round(wageDif[0], 2) + round(Double.parseDouble(vG), 2), 2);
                 Entry e = new Entry(g.debitEntry.get(i).content);
@@ -292,6 +295,7 @@ public class ConciliatorV2 {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContentG);
             if (l.contains("ADTO.") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1) {
+                g.debitEntry.get(i).errorType = 0;
                 String vG = entryContentG[entryContentG.length - 3];
                 wageDif[1] = round(round(wageDif[1], 2) + round(Double.parseDouble(vG), 2), 2);
                 Entry e = new Entry(g.debitEntry.get(i).content);
@@ -340,7 +344,7 @@ public class ConciliatorV2 {
                 p = new Paragraph(new Phrase(lineSpacing, "   *****************************", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                 document.add(p);
                 p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                        document.add(p);
+                document.add(p);
                 /////////////////////////////////////////////
                 ///////verifica diferenca de credito////////
                 ///////////////////////////////////////////
@@ -350,7 +354,7 @@ public class ConciliatorV2 {
                     p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                        document.add(p);
+                    document.add(p);
                     Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
                     f1.setColor(BaseColor.BLUE);
                     p = new Paragraph(new Phrase(lineSpacing, "         VALOR MAIOR: GOSOFT", f1));
@@ -389,7 +393,7 @@ public class ConciliatorV2 {
                     p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                        document.add(p);
+                    document.add(p);
                     Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
                     f1.setColor(BaseColor.BLUE);
                     p = new Paragraph(new Phrase(lineSpacing, "           VALOR MAIOR: BANCO", f1));
@@ -517,7 +521,7 @@ public class ConciliatorV2 {
                                     findCheckProblem = true;
                                 }
                                 p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                                 document.add(p);
+                                document.add(p);
                                 p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE COMPENSADO A MENOR", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
@@ -554,7 +558,7 @@ public class ConciliatorV2 {
                                         Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
                                         f1.setColor(BaseColor.RED);
                                         p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                        document.add(p);
+                                        document.add(p);
                                         p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) BAIXADO(S) COM DEVOLUCAO DE VALOR", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                         document.add(p);
                                         p = new Paragraph(new Phrase(lineSpacing, "             " + checkPair.get(i).entry.content, f1));
@@ -592,7 +596,7 @@ public class ConciliatorV2 {
                         findCheckProblem = true;
                     }
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                        document.add(p);
+                    document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) BAIXADO(S) NA DATA ERRADA", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     for (int i = 0; i < checkPairD.size(); i++) {
@@ -614,7 +618,7 @@ public class ConciliatorV2 {
                         findCheckProblem = true;
                     }
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                        document.add(p);
+                    document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     for (int i = 0; i < checkPairP.size(); i++) {
@@ -656,6 +660,8 @@ public class ConciliatorV2 {
                                 p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 p = new Paragraph(new Phrase(lineSpacing, "     PAGAMENTO(S) FUNCIONARIO(S) ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                document.add(p);
+                                p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 findWageProblem = true;
                             }
@@ -812,7 +818,60 @@ public class ConciliatorV2 {
                     }
                 }//for (int i = 0; i < wrongDate.size(); i++)
 
+                boolean findBankProblem = false;
+                f1.setColor(BaseColor.RED);
                 for (int i = 0; i < c.debitEntry.size(); i++) {
+                    if (c.debitEntry.get(i).errorType == -1) {
+                        if (!findWrongPay) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "     PAGAMENTO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findWrongPay = true;
+                            findBankProblem = true;
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) BAIXADO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                        }
+                        if (!findBankProblem) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) BAIXADO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findBankProblem=true;
+                        }
+                        p = new Paragraph(new Phrase(lineSpacing, "               " + c.debitEntry.get(i).content, f1));
+                        document.add(p);
+                    }
+                }
+
+                boolean findGosoftProblem = false;
+                f1.setColor(BaseColor.RED);
+                for (int i = 0; i < g.debitEntry.size(); i++) {
+                    if (g.debitEntry.get(i).errorType == -1) {
+                        if (!findWrongPay) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "     PAGAMENTO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findWrongPay = true;
+                            findGosoftProblem = true;
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         GOSOFT: PAGAMENTO(S) NAO ENCONTRADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                        }
+                        if (!findGosoftProblem) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         GOSOFT: PAGAMENTO(S) NAO ENCONTRADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findGosoftProblem=true;
+                        }
+                        p = new Paragraph(new Phrase(lineSpacing, "               " + g.debitEntry.get(i).content, f1));
+                        document.add(p);
+                    }
                 }
 
             } catch (DocumentException de) {
