@@ -831,13 +831,13 @@ public class ConciliatorV2 {
                             findBankProblem = true;
                             p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
-                            p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) BAIXADO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
                         }
                         if (!findBankProblem) {
                             p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
-                            p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) BAIXADO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
                             findBankProblem=true;
                         }
