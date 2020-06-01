@@ -169,7 +169,8 @@ public class TaxExtractor {
         int totalPages = reader.getNumberOfPages();
         String textFromPage = "";
         Condominium cond = null;
-
+        
+        ArrayList<String> listInvestDoc = new ArrayList<>();
         for (int i = 1; i <= totalPages; i++) {
             //	if(i==146)
             //		break;
@@ -203,10 +204,12 @@ public class TaxExtractor {
             }
             //if(c.equals("05.473.910/0001-05"))
             //System.out.println(cond.name);
-
+            
             if (lineFrag[0].equals("CNPJ/CPF:")) {
 
                 if (condList.contains(lineFrag[1]) && cond != null) {
+                    
+                    
                     for (int j = 5; j < lines.length; j++) {
                         String[] lineSplited = lines[j].split(" ");
                         if (lineSplited.length > 6) {
@@ -233,16 +236,30 @@ public class TaxExtractor {
 
                                     //System.out.println(lines[j]);
                                     //aplicacao: valor positivo
+                                    //AQUI
+                                    
                                 } else if (lineList.contains(investment[0]) || lineList.contains(investment[1]) || lineList.contains(investment[2])) {
                                     cond.appRescDate.add(lineSplited[0]);
                                     String v = lineSplited[lineSplited.length - 2];
+                                    //System.out.println(lineSplited[lineSplited.length - 4]);
+                                    listInvestDoc.add(lineSplited[lineSplited.length - 4]);
                                     cond.appRescValue.add(v);
 
                                     //ystem.out.println(lines[j]);
                                 } else {
 
                                     if (lineSplited[lineSplited.length - 1].equals("C")) {
-                                        cond.creditEntry.add(new Entry(lines[j]));
+                                        
+                                         if(lineList.contains("ESTORNO")){
+                                        
+                                       //System.out.println(listInvestDoc.contains(lineSplited[lineSplited.length - 4]));
+                                        cond.appRescDate.add(lineSplited[0]);
+                                        String v = lineSplited[lineSplited.length - 2];
+                                          //System.out.println(v);
+                                         cond.appRescValue.add("-" + v);
+                                        continue;
+                                    }
+                                          cond.creditEntry.add(new Entry(lines[j]));
                                         //System.out.println(lines[j]);
                                     } else {
                                         cond.debitEntry.add(new Entry(lines[j]));
@@ -290,11 +307,21 @@ public class TaxExtractor {
                                 //System.out.println(cond.name);
                                 cond.appRescDate.add(lineSplited[0]);
                                 String v = lineSplited[lineSplited.length - 2];
+                                listInvestDoc.add(lineSplited[lineSplited.length - 4]);
+                                //System.out.println(lineSplited[lineSplited.length - 4]);
                                 cond.appRescValue.add(v);
 
                                 // System.out.println(lines[j]);
                             } else {
                                 if (lineSplited[lineSplited.length - 1].equals("C")) {
+                                    if(lineList.contains("ESTORNO")){
+                                        //System.out.println(listInvestDoc.contains(lineSplited[lineSplited.length - 4]));
+                                        cond.appRescDate.add(lineSplited[0]);
+                                        String v = lineSplited[lineSplited.length - 2];
+                                          //System.out.println(v);
+                                         cond.appRescValue.add("-" + v);
+                                        continue;
+                                    }
                                     cond.creditEntry.add(new Entry(lines[j]));
                                     //System.out.println(lines[j]);
                                 } else {
