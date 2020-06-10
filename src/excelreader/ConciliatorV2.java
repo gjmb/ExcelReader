@@ -794,6 +794,20 @@ public class ConciliatorV2 {
                         }//for (int j = 0; j < g.debitEntry.size(); j++) {
                     }//if (c.debitEntry.get(i).errorType == -1)
                 }//for (int i = 0; i < c.debitEntry.size(); i++) 
+                
+                // CARTAO DE CREDITO: VER O QUE SOBROU NA 205
+                
+                // PAGAMENTOS EM DUAS CONTAS: SOMA 2 A 2?
+                
+                // PAGAMETOS PEQUENOS NA 205?
+                
+                // VERIFICAR SEQ DO NUMERO DE LANCAMENTOS, DATA E A CONTA???
+                
+                // PAGAMENTOS PEQUENOS PARA CIBRACON: LISTAR TODOS E FAZER A BUSCA ESPECIFICAMENTE NA CONTA 213
+                
+                // LISTA: {"CUSTAS", "BANCO", "VIRTUAL", "A3", "OBJETOS", "ENCARGOS", "ARQUIVO", "FIRMA", "CARTÓRIO", "CARTÓRIO",
+                // "CARTORIO", } 
+                
 
                 boolean findWrongPay = false;
                 f1.setColor(BaseColor.GRAY);
