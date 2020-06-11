@@ -874,7 +874,7 @@ public class ConciliatorV2 {
                         // System.out.println(v+" "+seq.get(j).entry);
                         if (v.equals(seq.get(j).entry.content)) {
                             notFoundC.get(i).errorType = 0;
-                            seq.get(j).entry.errorType = 0;
+                            seq.get(j).entry.content = notFoundC.get(i).content;
                         }
 
                     }
