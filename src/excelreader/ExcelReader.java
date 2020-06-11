@@ -66,7 +66,7 @@ public class ExcelReader {
             condMapG.put(condKeysG[i], new CondominiumG(condNames[i]));
         }
         source = source.replace("\\","/");
-        System.out.println(source);
+        //System.out.println(source);
         String[] fileNames = getFilesNames(source);
         for (int i = 0; i < fileNames.length; i++) {
             String[] splitedName = fileNames[i].split("\\.");
