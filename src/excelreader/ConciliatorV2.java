@@ -825,22 +825,22 @@ public class ConciliatorV2 {
                     String[] entryContentG = notFoundG.get(j).content.split(" ");
                     if (Integer.parseInt(entryContentG[0]) == (Integer.parseInt(seqAnt) + 1)) {
                         seqAnt = entryContentG[0];
-                        if(temp.size()==1)
-                            notFoundG.get(j-1).errorType=0;
+                        if (temp.size() == 1) {
+                            notFoundG.get(j - 1).errorType = 0;
+                        }
                         e = new Entry(notFoundG.get(j).content);
                         sumSeq = sumSeq + round(Double.parseDouble(entryContentG[entryContentG.length - 3]), 2);
                         temp.add(e);
-                        notFoundG.get(j).errorType=0;
-                       // System.out.println("YEP");
+                        notFoundG.get(j).errorType = 0;
+                        // System.out.println("YEP");
                         if (j == notFoundG.size() - 1) {
                             ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
                             ep.pair.addAll(temp);
                             if (temp.size() > 1) {
                                 seq.add(ep);
-                                notFoundG.get(j).errorType=0;
-                                
+                                notFoundG.get(j).errorType = 0;
+
                             }
-                            
 
                             //System.out.println(ep.entry.content + " " + temp.size() + " FIM");
                         }
@@ -848,10 +848,9 @@ public class ConciliatorV2 {
 
                         ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
                         ep.pair.addAll(temp);
-                        if (temp.size() > 1){ 
+                        if (temp.size() > 1) {
                             seq.add(ep);
                         }
-                        
 
                         temp.clear();
                         sumSeq = 0.0;
@@ -862,6 +861,26 @@ public class ConciliatorV2 {
                         //System.out.println(ep.entry.content + " " + temp.size() + " NOPE");
                     }
 
+                }
+
+                for (int i = 0; i < notFoundC.size(); i++) {
+                    String[] entryContent = notFoundC.get(i).content.split(" ");
+                    String v = entryContent[entryContent.length - 2].replace(".", "");
+                    v = v.replace(",", ".");
+                    if (v.charAt(v.length() - 1) == '0') {
+                        v = v.substring(0, v.length() - 1);
+                    }
+                    for(int j = 0; j < seq.size(); j++){
+                       // System.out.println(v+" "+seq.get(j).entry);
+                        if(v.equals(seq.get(j).entry.content)){
+                            notFoundC.get(i).errorType=0;
+                            
+                        }
+                        
+                    }
+                    
+                    
+                    
                 }
 
                 // CARTAO DE CREDITO: VER O QUE SOBROU NA 205
