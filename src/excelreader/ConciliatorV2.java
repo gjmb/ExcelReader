@@ -126,13 +126,13 @@ public class ConciliatorV2 {
 
             if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")) {
                 if (Integer.parseInt(dt[0]) <= 10) {
-                    c.debitEntry.get(i).errorType=0;
+                    c.debitEntry.get(i).errorType = 0;
                     dtW[0] = entryContent[0];
                     //System.out.println("dtW: " + dtW[0]);
                     w = entryContent;
                     wage[0] = round(round(wage[0], 2) + round(Double.parseDouble(v), 2), 2);
                 } else {
-                    c.debitEntry.get(i).errorType=0;
+                    c.debitEntry.get(i).errorType = 0;
                     dtA[0] = entryContent[0];
                     a = entryContent;
                     wage[1] = round(round(wage[1], 2) + round(Double.parseDouble(v), 2), 2);
@@ -751,6 +751,8 @@ public class ConciliatorV2 {
                 ///////verifica diferenca de debitos////////
                 ///////////////////////////////////////////
                 ArrayList<EntryPair> wrongDate = new ArrayList<>();
+                ArrayList<Entry> notFoundC = new ArrayList<>();
+                ArrayList<Entry> notFoundG = new ArrayList<>();
                 for (int i = 0; i < c.debitEntry.size(); i++) {
                     if (c.debitEntry.get(i).errorType == -1) {
                         String[] entryContent = c.debitEntry.get(i).content.split(" ");
@@ -793,22 +795,76 @@ public class ConciliatorV2 {
                             }
                         }//for (int j = 0; j < g.debitEntry.size(); j++) {
                     }//if (c.debitEntry.get(i).errorType == -1)
-                }//for (int i = 0; i < c.debitEntry.size(); i++) 
-                
-                // CARTAO DE CREDITO: VER O QUE SOBROU NA 205
-                
-                // PAGAMENTOS EM DUAS CONTAS: SOMA 2 A 2?
-                
-                // PAGAMETOS PEQUENOS NA 205?
-                
-                // VERIFICAR SEQ DO NUMERO DE LANCAMENTOS, DATA E A CONTA???
-                
-                // PAGAMENTOS PEQUENOS PARA CIBRACON: LISTAR TODOS E FAZER A BUSCA ESPECIFICAMENTE NA CONTA 213
-                
-                // LISTA: {"CUSTAS", "BANCO", "VIRTUAL", "A3", "OBJETOS", "ENCARGOS", "ARQUIVO", "FIRMA", "CARTÓRIO", "CARTÓRIO",
-                // "CARTORIO", } 
-                
+                    if (c.debitEntry.get(i).errorType == -1) {
+                        notFoundC.add(c.debitEntry.get(i));
+                    }
 
+                }//for (int i = 0; i < c.debitEntry.size(); i++) 
+
+                for (int j = 0; j < g.debitEntry.size(); j++) {
+                    if (g.debitEntry.get(j).errorType == -1) {
+                        notFoundG.add(g.debitEntry.get(j));
+                    }
+                }
+
+                ArrayList<EntryPair> seq = new ArrayList<>();
+                Entry e;
+                EntryPair ep;
+                String seqAnt = "";
+                Double sumSeq = 0.0;
+                ArrayList<Entry> temp = new ArrayList<>();
+                for (int j = 0; j < notFoundG.size(); j++) {
+                    if (j == 0) {
+                        e = new Entry(notFoundG.get(j).content);
+                        String[] entryContentG = notFoundG.get(j).content.split(" ");
+                        sumSeq = sumSeq + round(Double.parseDouble(entryContentG[entryContentG.length - 3]), 2);
+                        seqAnt = entryContentG[0];
+                        temp.add(e);
+                        continue;
+                    }
+                    String[] entryContentG = notFoundG.get(j).content.split(" ");
+                    if (Integer.parseInt(entryContentG[0]) == (Integer.parseInt(seqAnt) + 1)) {
+                        seqAnt = entryContentG[0];
+                        if(temp.size()==1)
+                            notFoundG.get(j-1).errorType=0;
+                        e = new Entry(notFoundG.get(j).content);
+                        sumSeq = sumSeq + round(Double.parseDouble(entryContentG[entryContentG.length - 3]), 2);
+                        temp.add(e);
+                        notFoundG.get(j).errorType=0;
+                       // System.out.println("YEP");
+                        if (j == notFoundG.size() - 1) {
+                            ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
+                            ep.pair.addAll(temp);
+                            if (temp.size() > 1) {
+                                seq.add(ep);
+                                notFoundG.get(j).errorType=0;
+                                
+                            }
+                            
+
+                            //System.out.println(ep.entry.content + " " + temp.size() + " FIM");
+                        }
+                    } else {
+
+                        ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
+                        ep.pair.addAll(temp);
+                        if (temp.size() > 1){ 
+                            seq.add(ep);
+                        }
+                        
+
+                        temp.clear();
+                        sumSeq = 0.0;
+                        sumSeq = sumSeq + round(Double.parseDouble(entryContentG[entryContentG.length - 3]), 2);
+                        e = new Entry(notFoundG.get(j).content);
+                        temp.add(e);
+                        seqAnt = entryContentG[0];
+                        //System.out.println(ep.entry.content + " " + temp.size() + " NOPE");
+                    }
+
+                }
+
+                // CARTAO DE CREDITO: VER O QUE SOBROU NA 205
                 boolean findWrongPay = false;
                 f1.setColor(BaseColor.GRAY);
                 for (int i = 0; i < wrongDate.size(); i++) {
@@ -834,8 +890,8 @@ public class ConciliatorV2 {
 
                 boolean findBankProblem = false;
                 f1.setColor(BaseColor.RED);
-                for (int i = 0; i < c.debitEntry.size(); i++) {
-                    if (c.debitEntry.get(i).errorType == -1) {
+                for (int i = 0; i < notFoundC.size(); i++) {
+                    if (notFoundC.get(i).errorType == -1) {
                         if (!findWrongPay) {
                             p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
@@ -853,17 +909,17 @@ public class ConciliatorV2 {
                             document.add(p);
                             p = new Paragraph(new Phrase(lineSpacing, "         BANCO: PAGAMENTO(S) NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
-                            findBankProblem=true;
+                            findBankProblem = true;
                         }
-                        p = new Paragraph(new Phrase(lineSpacing, "               " + c.debitEntry.get(i).content, f1));
+                        p = new Paragraph(new Phrase(lineSpacing, "               " + notFoundC.get(i).content, f1));
                         document.add(p);
                     }
                 }
 
                 boolean findGosoftProblem = false;
                 f1.setColor(BaseColor.RED);
-                for (int i = 0; i < g.debitEntry.size(); i++) {
-                    if (g.debitEntry.get(i).errorType == -1) {
+                for (int i = 0; i < notFoundG.size(); i++) {
+                    if (notFoundG.get(i).errorType == -1) {
                         if (!findWrongPay) {
                             p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
@@ -881,9 +937,9 @@ public class ConciliatorV2 {
                             document.add(p);
                             p = new Paragraph(new Phrase(lineSpacing, "         GOSOFT: PAGAMENTO(S) NAO ENCONTRADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
-                            findGosoftProblem=true;
+                            findGosoftProblem = true;
                         }
-                        p = new Paragraph(new Phrase(lineSpacing, "               " + g.debitEntry.get(i).content, f1));
+                        p = new Paragraph(new Phrase(lineSpacing, "               " + notFoundG.get(i).content, f1));
                         document.add(p);
                     }
                 }
