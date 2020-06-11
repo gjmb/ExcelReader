@@ -870,17 +870,15 @@ public class ConciliatorV2 {
                     if (v.charAt(v.length() - 1) == '0') {
                         v = v.substring(0, v.length() - 1);
                     }
-                    for(int j = 0; j < seq.size(); j++){
-                       // System.out.println(v+" "+seq.get(j).entry);
-                        if(v.equals(seq.get(j).entry.content)){
-                            notFoundC.get(i).errorType=0;
-                            
+                    for (int j = 0; j < seq.size(); j++) {
+                        // System.out.println(v+" "+seq.get(j).entry);
+                        if (v.equals(seq.get(j).entry.content)) {
+                            notFoundC.get(i).errorType = 0;
+                            seq.get(j).entry.errorType = 0;
                         }
-                        
+
                     }
-                    
-                    
-                    
+
                 }
 
                 // CARTAO DE CREDITO: VER O QUE SOBROU NA 205
