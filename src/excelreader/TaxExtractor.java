@@ -135,7 +135,7 @@ public class TaxExtractor {
                 }
                 //System.out.println(date+" "+value.replace(".", ","));
                 String[] d = date.split("/");
-                System.out.println(date + " " + value);
+                //System.out.println(date + " " + value);
                 if(d.length==3){
                     StrW.write(Integer.parseInt(d[0]) + ";" + value.replace(".", ",") + "\n");
                     if (Integer.parseInt(d[0]) < 31) {
