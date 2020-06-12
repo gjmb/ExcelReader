@@ -143,16 +143,19 @@ public class ConciliatorV2 {
             return;
         }
         w[w.length - 2] = Double.toString(wage[0]);
+        if(a!=null)
         a[a.length - 2] = Double.toString(wage[1]);
         String wContent = "";
         String aContent = "";
         for (int i = 0; i < w.length; i++) {
             wContent = wContent + w[i] + " ";
         }
+        if(a!=null)
         for (int i = 0; i < a.length; i++) {
             aContent = aContent + a[i] + " ";
         }
         p.add(new EntryPair(new Entry(wContent)));
+        if(a!=null)
         p.add(new EntryPair(new Entry(aContent)));
 
     } // wageTotal
@@ -276,6 +279,9 @@ public class ConciliatorV2 {
             }
 
         }
+        
+        if(Adv.isEmpty())
+            return;
 
         for (int i = 0; i < Adv.size(); i++) {
             p.add(Adv.get(i));
@@ -522,7 +528,7 @@ public class ConciliatorV2 {
                                 }
                                 p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
-                                p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE COMPENSADO A MENOR", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) COMPENSADO(S) A MENOR", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
                                 f1.setColor(BaseColor.RED);
@@ -666,8 +672,10 @@ public class ConciliatorV2 {
                                 findWageProblem = true;
                             }
                             String[] entryContent = w.get(i).entry.content.split(" ");
-                            List<String> l = Arrays.asList(entryContent);
+                            List<String> l = Arrays.asList(entryContent);   
                             String[] dt = entryContent[0].split("/");
+                            
+                            //System.out.println(w.get(i).entry.content + " "+  dt.length + " "+ dt[0]);
                             if (w.get(i).entry.errorType == -1 && wageDif[0] != 0 && Integer.parseInt(dt[0]) <= 10 && w.get(i).pair.size() > 0) {
 
                                 p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE SALDO SALARIO BAIXADO(S) COM DIFERENCA DE VALOR ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
@@ -750,9 +758,12 @@ public class ConciliatorV2 {
                 /////////////////////////////////////////////
                 ///////verifica diferenca de debitos////////
                 ///////////////////////////////////////////
+
                 ArrayList<EntryPair> wrongDate = new ArrayList<>();
                 ArrayList<Entry> notFoundC = new ArrayList<>();
                 ArrayList<Entry> notFoundG = new ArrayList<>();
+
+                //VERIFICA CASOS 1 PARA 1
                 for (int i = 0; i < c.debitEntry.size(); i++) {
                     if (c.debitEntry.get(i).errorType == -1) {
                         String[] entryContent = c.debitEntry.get(i).content.split(" ");
@@ -813,6 +824,8 @@ public class ConciliatorV2 {
                 String seqAnt = "";
                 Double sumSeq = 0.0;
                 ArrayList<Entry> temp = new ArrayList<>();
+
+                //PROCURA CASOS 1 PARA N
                 for (int j = 0; j < notFoundG.size(); j++) {
                     if (j == 0) {
                         e = new Entry(notFoundG.get(j).content);
@@ -820,6 +833,7 @@ public class ConciliatorV2 {
                         sumSeq = sumSeq + round(Double.parseDouble(entryContentG[entryContentG.length - 3]), 2);
                         seqAnt = entryContentG[0];
                         temp.add(e);
+                        notFoundG.get(j).errorType = 0;
                         continue;
                     }
                     String[] entryContentG = notFoundG.get(j).content.split(" ");
@@ -848,7 +862,9 @@ public class ConciliatorV2 {
 
                         ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
                         ep.pair.addAll(temp);
-                        if (temp.size() > 1) {
+                        List <String> l = Arrays.asList(temp.get(0).content.split(" "));
+                        if (temp.size() > 1 || (temp.size()==1 && l.contains("00000205"))) {
+                            notFoundG.get(j).errorType = 0;
                             seq.add(ep);
                         }
 
@@ -863,6 +879,7 @@ public class ConciliatorV2 {
 
                 }
 
+                //VERIFICA CASOS 1 PARA N    
                 for (int i = 0; i < notFoundC.size(); i++) {
                     String[] entryContent = notFoundC.get(i).content.split(" ");
                     String v = entryContent[entryContent.length - 2].replace(".", "");
@@ -873,7 +890,14 @@ public class ConciliatorV2 {
                     for (int j = 0; j < seq.size(); j++) {
                         // System.out.println(v+" "+seq.get(j).entry);
                         if (v.equals(seq.get(j).entry.content)) {
-                            notFoundC.get(i).errorType = 0;
+                            String[] entryContentG = seq.get(j).pair.get(0).content.split(" ");
+                            if (entryContent[0].equals(entryContentG[1])) {
+                                notFoundC.get(i).errorType = 0;
+                                seq.get(j).entry.errorType = 0;
+                            } else {
+                                notFoundC.get(i).errorType = 1;
+                                seq.get(j).entry.errorType = 1;
+                            }
                             seq.get(j).entry.content = notFoundC.get(i).content;
                         }
 
@@ -881,7 +905,6 @@ public class ConciliatorV2 {
 
                 }
 
-                // CARTAO DE CREDITO: VER O QUE SOBROU NA 205
                 boolean findWrongPay = false;
                 f1.setColor(BaseColor.GRAY);
                 for (int i = 0; i < wrongDate.size(); i++) {
@@ -902,6 +925,29 @@ public class ConciliatorV2 {
                     for (int j = 0; j < wrongDate.get(i).pair.size(); j++) {
                         p = new Paragraph(new Phrase(lineSpacing, "                     " + wrongDate.get(i).pair.get(j).content, f1));
                         document.add(p);
+                    }
+                }//for (int i = 0; i < wrongDate.size(); i++)
+
+                for (int i = 0; i < seq.size(); i++) {
+                    if(seq.get(i).entry.errorType==1){
+                        if (!findWrongPay) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "     PAGAMENTO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findWrongPay = true;
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) BAIXADO(S) NA DATA ERRADA", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                        }
+
+                        p = new Paragraph(new Phrase(lineSpacing, "               " + seq.get(i).entry.content, f1));
+                        document.add(p);
+                        for (int j = 0; j < seq.get(i).pair.size(); j++) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                     " + seq.get(i).pair.get(j).content, f1));
+                            document.add(p);
+                        }
                     }
                 }//for (int i = 0; i < wrongDate.size(); i++)
 
@@ -928,6 +974,53 @@ public class ConciliatorV2 {
                             document.add(p);
                             findBankProblem = true;
                         }
+
+                        String[] entryContent = notFoundC.get(i).content.split(" ");
+                        String v = entryContent[entryContent.length - 2].replace(".", "");
+                        v = v.replace(",", ".");
+                        if (v.charAt(v.length() - 1) == '0') {
+                            v = v.substring(0, v.length() - 1);
+                        }
+                        List<String> l = Arrays.asList(entryContent);
+                        if (l.contains("CARTAO") && l.contains("CREDITO")) {
+                            p = new Paragraph(new Phrase(lineSpacing, "               " + notFoundC.get(i).content, f1));
+                            document.add(p);
+                            for (int j = 0; j < seq.size(); j++) {
+                                if (seq.get(j).entry.errorType == -1) {
+                                    double dif = (Double.parseDouble(v) - Double.parseDouble(seq.get(j).entry.content));
+                                    if (dif < 35 && dif > 0) {
+                                        boolean manut=true;
+                                        for (int k = 0; k < seq.get(j).pair.size(); k++) {
+                                            String[] entryContentG = seq.get(j).pair.get(k).content.split(" ");
+                                            List<String> lg = Arrays.asList(entryContentG);
+                                            if(!lg.contains("00000205")){
+                                                
+                                                manut=false;
+                                                break;
+                                            } 
+                                            seq.get(j).entry.errorType=0;
+                                            if(k==0){
+                                                p = new Paragraph(new Phrase(lineSpacing, "                   GOSOFT: ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                                 document.add(p);
+                                            }
+                                            p = new Paragraph(new Phrase(lineSpacing, "                   " + seq.get(j).pair.get(k).content, f1));
+                                            document.add(p);
+                                        }
+                                        if(manut){
+                                        p = new Paragraph(new Phrase(lineSpacing, "                   DIFERENCA: " + round(dif,2) + " ANUIDADE? ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                            document.add(p);
+                                            p = new Paragraph(new Phrase(lineSpacing, "                   ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                            document.add(p);
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                            continue;
+                        }
+
                         p = new Paragraph(new Phrase(lineSpacing, "               " + notFoundC.get(i).content, f1));
                         document.add(p);
                     }
@@ -958,6 +1051,33 @@ public class ConciliatorV2 {
                         }
                         p = new Paragraph(new Phrase(lineSpacing, "               " + notFoundG.get(i).content, f1));
                         document.add(p);
+                    }
+                }
+                for (int i = 0; i < seq.size(); i++) {
+                    if (seq.get(i).entry.errorType == -1) {
+                        if (!findWrongPay) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "     PAGAMENTO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findWrongPay = true;
+                            findGosoftProblem = true;
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         GOSOFT: PAGAMENTO(S) NAO ENCONTRADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                        }
+                        if (!findGosoftProblem) {
+                            p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            p = new Paragraph(new Phrase(lineSpacing, "         GOSOFT: PAGAMENTO(S) NAO ENCONTRADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                            document.add(p);
+                            findGosoftProblem = true;
+                        }
+                        for (int j = 0; j < seq.get(i).pair.size(); j++) {
+                            p = new Paragraph(new Phrase(lineSpacing, "               " + seq.get(i).pair.get(j).content, f1));
+                            document.add(p);
+                        }
                     }
                 }
 
