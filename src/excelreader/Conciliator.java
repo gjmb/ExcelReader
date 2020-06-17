@@ -383,7 +383,7 @@ public class Conciliator {
                                         //      System.out.println("268 " + c.debitEntry.get(i).content);
                                         //     System.out.println("269 " + g.debitEntry.get(j).content);
                                         break;
-                                    } else {
+                                    } else {    
                                         //     System.out.println("272 " + c.debitEntry.get(i).content);
                                         //     System.out.println("273 " + g.debitEntry.get(j).content);
                                         c.debitEntry.get(i).errorType = 1;
@@ -582,7 +582,7 @@ public class Conciliator {
                         document.add(p);
                     }
                 }
-                p = new Paragraph(new Phrase(lineSpacing, "GOSOFT: PAGAMENTO NAO ENCONTRADO", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                    p = new Paragraph(new Phrase(lineSpacing, "GOSOFT: PAGAMENTO NAO ENCONTRADO", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                 document.add(p);
 
                 //TODO: Ignorar transferencia

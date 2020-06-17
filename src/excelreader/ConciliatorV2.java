@@ -143,20 +143,23 @@ public class ConciliatorV2 {
             return;
         }
         w[w.length - 2] = Double.toString(wage[0]);
-        if(a!=null)
-        a[a.length - 2] = Double.toString(wage[1]);
+        if (a != null) {
+            a[a.length - 2] = Double.toString(wage[1]);
+        }
         String wContent = "";
         String aContent = "";
         for (int i = 0; i < w.length; i++) {
             wContent = wContent + w[i] + " ";
         }
-        if(a!=null)
-        for (int i = 0; i < a.length; i++) {
-            aContent = aContent + a[i] + " ";
+        if (a != null) {
+            for (int i = 0; i < a.length; i++) {
+                aContent = aContent + a[i] + " ";
+            }
         }
         p.add(new EntryPair(new Entry(wContent)));
-        if(a!=null)
-        p.add(new EntryPair(new Entry(aContent)));
+        if (a != null) {
+            p.add(new EntryPair(new Entry(aContent)));
+        }
 
     } // wageTotal
 
@@ -279,9 +282,10 @@ public class ConciliatorV2 {
             }
 
         }
-        
-        if(Adv.isEmpty())
+
+        if (Adv.isEmpty()) {
             return;
+        }
 
         for (int i = 0; i < Adv.size(); i++) {
             p.add(Adv.get(i));
@@ -357,7 +361,7 @@ public class ConciliatorV2 {
                 double tg = creditTotalG(g);
                 double t = creditTotal(c);
                 if (tg > t) {
-                    p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                    p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO* ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
@@ -396,7 +400,7 @@ public class ConciliatorV2 {
                     }
 
                 } else if (t > tg) {
-                    p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                    p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO* ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
@@ -672,9 +676,9 @@ public class ConciliatorV2 {
                                 findWageProblem = true;
                             }
                             String[] entryContent = w.get(i).entry.content.split(" ");
-                            List<String> l = Arrays.asList(entryContent);   
+                            List<String> l = Arrays.asList(entryContent);
                             String[] dt = entryContent[0].split("/");
-                            
+
                             //System.out.println(w.get(i).entry.content + " "+  dt.length + " "+ dt[0]);
                             if (w.get(i).entry.errorType == -1 && wageDif[0] != 0 && Integer.parseInt(dt[0]) <= 10 && w.get(i).pair.size() > 0) {
 
@@ -862,8 +866,8 @@ public class ConciliatorV2 {
 
                         ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
                         ep.pair.addAll(temp);
-                        List <String> l = Arrays.asList(temp.get(0).content.split(" "));
-                        if (temp.size() > 1 || (temp.size()==1 && l.contains("00000205"))) {
+                        List<String> l = Arrays.asList(temp.get(0).content.split(" "));
+                        if (temp.size() > 1 || (temp.size() == 1 && l.contains("00000205"))) {
                             notFoundG.get(j).errorType = 0;
                             seq.add(ep);
                         }
@@ -929,7 +933,7 @@ public class ConciliatorV2 {
                 }//for (int i = 0; i < wrongDate.size(); i++)
 
                 for (int i = 0; i < seq.size(); i++) {
-                    if(seq.get(i).entry.errorType==1){
+                    if (seq.get(i).entry.errorType == 1) {
                         if (!findWrongPay) {
                             p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                             document.add(p);
@@ -989,25 +993,25 @@ public class ConciliatorV2 {
                                 if (seq.get(j).entry.errorType == -1) {
                                     double dif = (Double.parseDouble(v) - Double.parseDouble(seq.get(j).entry.content));
                                     if (dif < 35 && dif > 0) {
-                                        boolean manut=true;
+                                        boolean manut = true;
                                         for (int k = 0; k < seq.get(j).pair.size(); k++) {
                                             String[] entryContentG = seq.get(j).pair.get(k).content.split(" ");
                                             List<String> lg = Arrays.asList(entryContentG);
-                                            if(!lg.contains("00000205")){
-                                                
-                                                manut=false;
+                                            if (!lg.contains("00000205")) {
+
+                                                manut = false;
                                                 break;
-                                            } 
-                                            seq.get(j).entry.errorType=0;
-                                            if(k==0){
+                                            }
+                                            seq.get(j).entry.errorType = 0;
+                                            if (k == 0) {
                                                 p = new Paragraph(new Phrase(lineSpacing, "                   GOSOFT: ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                                                 document.add(p);
+                                                document.add(p);
                                             }
                                             p = new Paragraph(new Phrase(lineSpacing, "                   " + seq.get(j).pair.get(k).content, f1));
                                             document.add(p);
                                         }
-                                        if(manut){
-                                        p = new Paragraph(new Phrase(lineSpacing, "                   DIFERENCA: " + round(dif,2) + " ANUIDADE? ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                        if (manut) {
+                                            p = new Paragraph(new Phrase(lineSpacing, "                   DIFERENCA: " + round(dif, 2) + " ANUIDADE? ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                             document.add(p);
                                             p = new Paragraph(new Phrase(lineSpacing, "                   ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                             document.add(p);
@@ -1080,6 +1084,14 @@ public class ConciliatorV2 {
                         }
                     }
                 }
+                p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                document.add(p);
+                p = new Paragraph(new Phrase(lineSpacing, "     NOTAS(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                document.add(p);
+                 p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                document.add(p);
+                p = new Paragraph(new Phrase(lineSpacing, "         *Diferenca entre a soma de todos os creditos encontrados no extrato e todos os creditos encontrados no gosoft", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                document.add(p);
 
             } catch (DocumentException de) {
                 System.err.println(de.getMessage());
