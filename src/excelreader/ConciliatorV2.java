@@ -111,9 +111,9 @@ public class ConciliatorV2 {
         return round(total, 2);
     } // creditTotal
 
-    public static void wageTotal(Condominium c, double[] wage, String[] dtW, String[] dtA, ArrayList<EntryPair> p) {
+    public static void wageTotal(Condominium c, double[] wage, String[] dtW, ArrayList<EntryPair> p) {
         String[] w = null;
-        String[] a = null;
+
         for (int i = 0; i < c.debitEntry.size(); i++) {
             String[] entryContent = c.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContent);
@@ -132,10 +132,7 @@ public class ConciliatorV2 {
                     w = entryContent;
                     wage[0] = round(round(wage[0], 2) + round(Double.parseDouble(v), 2), 2);
                 } else {
-                    c.debitEntry.get(i).errorType = 0;
-                    dtA[0] = entryContent[0];
-                    a = entryContent;
-                    wage[1] = round(round(wage[1], 2) + round(Double.parseDouble(v), 2), 2);
+                    break;
                 }
             } // if l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")
         } // for int i = 0; i < c.debitEntry.size(); i++
@@ -143,31 +140,57 @@ public class ConciliatorV2 {
             return;
         }
         w[w.length - 2] = Double.toString(wage[0]);
-        if (a != null) {
-            a[a.length - 2] = Double.toString(wage[1]);
-        }
+
         String wContent = "";
-        String aContent = "";
+
         for (int i = 0; i < w.length; i++) {
             wContent = wContent + w[i] + " ";
         }
-        if (a != null) {
-            for (int i = 0; i < a.length; i++) {
-                aContent = aContent + a[i] + " ";
-            }
-        }
+
         p.add(new EntryPair(new Entry(wContent)));
-        if (a != null) {
-            p.add(new EntryPair(new Entry(aContent)));
+
+    } // wageTotal
+
+    public static void advTotal(Condominium c, double[] adv, String[] dtA, ArrayList<EntryPair> p) {
+
+        String[] a = null;
+        for (int i = 0; i < c.debitEntry.size(); i++) {
+            String[] entryContent = c.debitEntry.get(i).content.split(" ");
+            List<String> l = Arrays.asList(entryContent);
+            String v = entryContent[entryContent.length - 2].replace(".", "");
+            v = v.replace(",", ".");
+            if (v.charAt(v.length() - 1) == '0') {
+                v = v.substring(0, v.length() - 1);
+            }
+            String[] dt = entryContent[0].split("/");
+
+            if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")) {
+                if (Integer.parseInt(dt[0]) > 10) {
+                    c.debitEntry.get(i).errorType = 0;
+                    dtA[0] = entryContent[0];
+                    a = entryContent;
+                    adv[0] = round(round(adv[0], 2) + round(Double.parseDouble(v), 2), 2);
+                }
+            } // if l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS")
+        } // for int i = 0; i < c.debitEntry.size(); i++
+        if (a == null) {
+            return;
         }
 
+        a[a.length - 2] = Double.toString(adv[0]);
+
+        String aContent = "";
+
+        for (int i = 0; i < a.length; i++) {
+            aContent = aContent + a[i] + " ";
+        }
+
+        p.add(new EntryPair(new Entry(aContent)));
     } // wageTotal
 
     public static void wageFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
         String[] dtW = {""};
-        String[] dtA = {""};
-        ArrayList<EntryPair> Adv = new ArrayList<>();
-
+        
         //Busca por pagamentos de salario individuais 
         for (int i = 0; i < g.debitEntry.size(); i++) {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
@@ -201,40 +224,10 @@ public class ConciliatorV2 {
                             break;
                         }
                     }// if vG.equals(v)   
-                }// for Entry debitEntry : c.debitEntry
-                //Busca por pagamentos de salario individuais
-            } else if (l.contains("ADTO.") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1) {
-                String vG = entryContentG[entryContentG.length - 3];
-                for (Entry debitEntry : c.debitEntry) {
-                    String[] entryContent = debitEntry.content.split(" ");
-                    List<String> l2 = Arrays.asList(entryContent);
-                    String v = entryContent[entryContent.length - 2].replace(".", "");
-                    v = v.replace(",", ".");
-                    if (v.charAt(v.length() - 1) == '0') {
-                        v = v.substring(0, v.length() - 1);
-                    }
-                    if (vG.equals(v)) {
-                        if (l2.contains(entryContentG[entryContentG.length - 4])) {
-                            EntryPair ep = new EntryPair(new Entry(debitEntry.content));
-                            Entry e = new Entry(g.debitEntry.get(i).content);
-                            if (l2.contains(entryContentG[1])) {
-                                ep.entry.errorType = 0;
-                                e.errorType = 0;
-                            } else {
-                                ep.entry.errorType = 1;
-                                e.errorType = 1;
-                            }
-                            ep.pair.add(e);
-                            Adv.add(ep);
-                            g.debitEntry.get(i).errorType = 0;
-                            debitEntry.errorType = 0;
-                            break;
-                        }
-                    }// if vG.equals(v)   
-                }// for Entry debitEntry : c.debitEntry
-            }// else if
+                }// for Entry debitEntry : c.debitEntry               
+            } //l.contains("SALDO") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1
         } // for (int i = 0; i < g.debitEntry.size(); i++)  
-        wageTotal(c, wage, dtW, dtA, p);
+        wageTotal(c, wage, dtW, p);
         if (p.isEmpty()) {
             return;
         }
@@ -283,19 +276,63 @@ public class ConciliatorV2 {
 
         }
 
-        if (Adv.isEmpty()) {
+    }// public static void wageFinder
+    //TODO: TESTAR wageFinder
+    
+     public static void advFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
+        String[] dtW = {""};
+        
+        //Busca por pagamentos de salario individuais 
+        for (int i = 0; i < g.debitEntry.size(); i++) {
+            String[] entryContentG = g.debitEntry.get(i).content.split(" ");
+            List<String> l = Arrays.asList(entryContentG);
+            if (l.contains("ADTO.") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1) {
+                String vG = entryContentG[entryContentG.length - 3];
+                for (Entry debitEntry : c.debitEntry) {
+                    String[] entryContent = debitEntry.content.split(" ");
+                    List<String> l2 = Arrays.asList(entryContent);
+                    String v = entryContent[entryContent.length - 2].replace(".", "");
+                    v = v.replace(",", ".");
+                    if (v.charAt(v.length() - 1) == '0') {
+                        v = v.substring(0, v.length() - 1);
+                    }
+                    if (vG.equals(v)) {
+                        if (l2.contains(entryContentG[entryContentG.length - 4])) {
+                            EntryPair ep = new EntryPair(new Entry(debitEntry.content));
+                            Entry e = new Entry(g.debitEntry.get(i).content);
+                            if (l2.contains(entryContentG[1])) {
+                                ep.entry.errorType = 0;
+                                e.errorType = 0;
+                            } else {
+                                ep.entry.errorType = 1;
+                                e.errorType = 1;
+                            }
+
+                            ep.pair.add(e);
+                            p.add(ep);
+                            g.debitEntry.get(i).errorType = 0;
+                            debitEntry.errorType = 0;
+                            break;
+                        }
+                    }// if vG.equals(v)   
+                }// for Entry debitEntry : c.debitEntry               
+            } //l.contains("SALDO") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1
+        } // for (int i = 0; i < g.debitEntry.size(); i++)  
+        advTotal(c, wage, dtW, p);
+        if (p.isEmpty()) {
             return;
         }
-
-        for (int i = 0; i < Adv.size(); i++) {
-            p.add(Adv.get(i));
+        if (wage[0] == 0.0) {
+            p.removeAll(p);
+            return;
         }
-
+        EntryPair ep = null;
+        //TODO: ARRUMAR 
         for (int i = 0; i < p.size(); i++) {
             String[] entryContent = p.get(i).entry.content.split(" ");
             //System.out.println("dtW: " + dtW[0] + " " + p.get(i).entry.content);
             List<String> l = Arrays.asList(entryContent);
-            if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS") && l.contains(dtA[0])) {
+            if (l.contains("PAGAMENTO") && l.contains("FUNCIONARIOS") && l.contains(dtW[0])) {
                 ep = p.get(i);
                 break;
             }
@@ -307,30 +344,30 @@ public class ConciliatorV2 {
             if (l.contains("ADTO.") && l.contains("00000167") && g.debitEntry.get(i).errorType == -1) {
                 g.debitEntry.get(i).errorType = 0;
                 String vG = entryContentG[entryContentG.length - 3];
-                wageDif[1] = round(round(wageDif[1], 2) + round(Double.parseDouble(vG), 2), 2);
+                wageDif[0] = round(round(wageDif[0], 2) + round(Double.parseDouble(vG), 2), 2);
                 Entry e = new Entry(g.debitEntry.get(i).content);
                 ep.pair.add(e);
             }
         }// for (int i = 0; i < g.debitEntry.size(); i++)
-        wageDif[1] = round(round(wageDif[1], 2) - round(wage[1], 2), 2);
-        if (wageDif[1] == 0.0) {
+        wageDif[0] = round(round(wageDif[0], 2) - round(wage[0], 2), 2);
+        if (wageDif[0] == 0.0) {
             ep.entry.errorType = 0;
             for (int i = 0; i < ep.pair.size(); i++) {
                 String[] entryContent = ep.pair.get(i).content.split(" ");
 
                 List<String> l = Arrays.asList(entryContent);
-                if (l.contains(dtA[0])) {
+                if (l.contains(dtW[0])) {
                     ep.pair.get(i).errorType = 0;
                 } else {
                     ep.pair.get(i).errorType = 1;
                     ep.entry.errorType = 1;
                 }
+
             }
 
         }
 
-    }// public static void wageFinder
-    //TODO: TESTAR wageFinder
+    }
 
     public static void checker(Map<String, Condominium> condMap, Map<String, CondominiumG> condMapG, String dest) {
         dest = dest.replace("\\", "/");
@@ -360,7 +397,9 @@ public class ConciliatorV2 {
                 ///////////////////////////////////////////
                 double tg = creditTotalG(g);
                 double t = creditTotal(c);
+                boolean findDifCredit = false;
                 if (tg > t) {
+                    findDifCredit = true;
                     p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO* ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
@@ -400,6 +439,7 @@ public class ConciliatorV2 {
                     }
 
                 } else if (t > tg) {
+                    findDifCredit = true;
                     p = new Paragraph(new Phrase(lineSpacing, "     DIFERENCA DE CREDITO* ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
@@ -655,8 +695,8 @@ public class ConciliatorV2 {
 
                 if (condKeysWage.contains(ExcelReader.condKeysG[index])) {
 
-                    double[] wageDif = {0.0, 0.0};
-                    double[] wage = {0.0, 0.0};
+                    double[] wageDif = {0.0};
+                    double[] wage = {0.0};
                     ArrayList<EntryPair> w = new ArrayList<>();
 
                     wageFinder(g, c, wageDif, wage, w);
@@ -715,10 +755,37 @@ public class ConciliatorV2 {
                                     p = new Paragraph(new Phrase(lineSpacing, "                 " + w.get(i).pair.get(j).content, f1));
                                     document.add(p);
                                 }
-                            } else if (w.get(i).entry.errorType == -1 && wageDif[1] != 0 && Integer.parseInt(dt[0]) > 10 && w.get(i).pair.size() > 0) {
+                            }
+
+                        }
+                        //System.out.println("wage: " + wage[1]);
+                        //System.out.println("wageDif:  " + wageDif[1]);
+                    }
+                    
+                    wageDif[0] = 0;
+                    wage[0] = 0;
+                     w = new ArrayList<>();
+
+                    advFinder(g, c, wageDif, wage, w);
+                    
+                    for (int i = 0; i < w.size(); i++) {
+                        if (w.get(i).entry.errorType != 0) {
+                            if (!findWageProblem) {
+                                p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                document.add(p);
+                                p = new Paragraph(new Phrase(lineSpacing, "     PAGAMENTO(S) FUNCIONARIO(S) ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                document.add(p);
+                                p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                document.add(p);
+                                findWageProblem = true;
+                            }
+                            String[] entryContent = w.get(i).entry.content.split(" ");
+                            List<String> l = Arrays.asList(entryContent);
+                            String[] dt = entryContent[0].split("/");
+                            if (w.get(i).entry.errorType == -1 && wageDif[0] != 0 && Integer.parseInt(dt[0]) > 10 && w.get(i).pair.size() > 0) {
                                 p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO. SALARIO BAIXADO(S) COM DIFERENCA DE VALOR ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
-                                p = new Paragraph(new Phrase(lineSpacing, "               DIFERENCA: " + round(Math.abs(wageDif[1]), 2), FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                p = new Paragraph(new Phrase(lineSpacing, "               DIFERENCA: " + round(Math.abs(wageDif[0]), 2), FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 f1.setColor(BaseColor.RED);
                                 p = new Paragraph(new Phrase(lineSpacing, "               " + w.get(i).entry.content, f1));
@@ -733,13 +800,13 @@ public class ConciliatorV2 {
                                     p = new Paragraph(new Phrase(lineSpacing, "                 " + w.get(i).pair.get(j).content, f1));
                                     document.add(p);
                                 }
-                            } else if (w.get(i).entry.errorType == -1 && (wageDif[1] == 0 || (wageDif[1] != 0 && w.get(i).pair.isEmpty())) && Integer.parseInt(dt[0]) > 10) {
+                            } else if (w.get(i).entry.errorType == -1 && (wageDif[0] == 0 || (wageDif[0] != 0 && w.get(i).pair.isEmpty())) && Integer.parseInt(dt[0]) > 10) {
                                 p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO. SALARIO NAO LANCADO(S) OU NAO BAIXADO(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 f1.setColor(BaseColor.RED);
                                 p = new Paragraph(new Phrase(lineSpacing, "               " + w.get(i).entry.content, f1));
                                 document.add(p);
-                            } else if (w.get(i).entry.errorType == 1 && wageDif[1] == 0 && Integer.parseInt(dt[0]) > 10) {
+                            } else if (w.get(i).entry.errorType == 1 && wageDif[0] == 0 && Integer.parseInt(dt[0]) > 10) {
                                 p = new Paragraph(new Phrase(lineSpacing, "         PAGAMENTO(S) DE ADTO. SALARIO BAIXADO(S) NA DATA ERRADA ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                 document.add(p);
                                 f1.setColor(BaseColor.RED);
@@ -751,6 +818,8 @@ public class ConciliatorV2 {
                                 }
                             }
 
+                            //System.out.println(w.get(i).entry.content + " "+  dt.length + " "+ dt[0]);
+                            
                         }
                         //System.out.println("wage: " + wage[1]);
                         //System.out.println("wageDif:  " + wageDif[1]);
@@ -767,12 +836,12 @@ public class ConciliatorV2 {
                 ArrayList<Entry> notFoundC = new ArrayList<>();
                 ArrayList<Entry> notFoundG = new ArrayList<>();
 
-                //VERIFICA CASOS 1 PARA 1
                 for (int i = 0; i < c.debitEntry.size(); i++) {
                     if (c.debitEntry.get(i).errorType == -1) {
                         String[] entryContent = c.debitEntry.get(i).content.split(" ");
                         String v = entryContent[entryContent.length - 2].replace(".", "");
                         v = v.replace(",", ".");
+
                         if (v.charAt(v.length() - 1) == '0') {
                             v = v.substring(0, v.length() - 1);
                         }
@@ -815,9 +884,10 @@ public class ConciliatorV2 {
                     }
 
                 }//for (int i = 0; i < c.debitEntry.size(); i++) 
-
+                System.out.println(g.name);
                 for (int j = 0; j < g.debitEntry.size(); j++) {
                     if (g.debitEntry.get(j).errorType == -1) {
+                        System.out.println(g.debitEntry.get(j).content);
                         notFoundG.add(g.debitEntry.get(j));
                     }
                 }
@@ -888,6 +958,7 @@ public class ConciliatorV2 {
                     String[] entryContent = notFoundC.get(i).content.split(" ");
                     String v = entryContent[entryContent.length - 2].replace(".", "");
                     v = v.replace(",", ".");
+                   
                     if (v.charAt(v.length() - 1) == '0') {
                         v = v.substring(0, v.length() - 1);
                     }
@@ -982,6 +1053,7 @@ public class ConciliatorV2 {
                         String[] entryContent = notFoundC.get(i).content.split(" ");
                         String v = entryContent[entryContent.length - 2].replace(".", "");
                         v = v.replace(",", ".");
+                       
                         if (v.charAt(v.length() - 1) == '0') {
                             v = v.substring(0, v.length() - 1);
                         }
@@ -1090,8 +1162,11 @@ public class ConciliatorV2 {
                 document.add(p);
                  p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                 document.add(p);
-                p = new Paragraph(new Phrase(lineSpacing, "         *Diferenca entre a soma de todos os creditos encontrados no extrato e todos os creditos encontrados no gosoft", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                document.add(p);
+                  if(findDifCredit){
+                    p = new Paragraph(new Phrase(lineSpacing, "         *Diferenca entre a soma de todos os creditos encontrados no extrato e todos os creditos encontrados no gosoft", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                    document.add(p);
+                }
+
 
             } catch (DocumentException de) {
                 System.err.println(de.getMessage());
