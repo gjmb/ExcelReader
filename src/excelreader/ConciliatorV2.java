@@ -41,7 +41,7 @@ public class ConciliatorV2 {
         for (int i = 0; i < c.debitEntry.size(); i++) {
             String[] entryContent = c.debitEntry.get(i).content.split(" ");
             List<String> l = Arrays.asList(entryContent);
-            if (l.contains("CHEQUE")) {
+            if (l.contains("CHEQUE") || l.contains("CHQ.PAGO")) {
                 EntryPair ep = new EntryPair(new Entry(c.debitEntry.get(i).content));
                 p.add(ep);
                 c.debitEntry.get(i).errorType = 0;
