@@ -950,10 +950,10 @@ public class ConciliatorV2 {
                         ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
                         ep.pair.addAll(temp);
                         List<String> l = Arrays.asList(temp.get(0).content.split(" "));
-                        if (temp.size() > 1 || (temp.size() == 1 && l.contains("00000205"))) {
+                        
                             notFoundG.get(j).errorType = 0;
                             seq.add(ep);
-                        }
+                        
 
                         temp.clear();
                         sumSeq = 0.0;
