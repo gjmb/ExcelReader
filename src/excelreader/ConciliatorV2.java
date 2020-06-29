@@ -884,14 +884,20 @@ public class ConciliatorV2 {
                     }
 
                 }//for (int i = 0; i < c.debitEntry.size(); i++) 
-                System.out.println(g.name);
+                System.out.println(g.name + " G");
                 for (int j = 0; j < g.debitEntry.size(); j++) {
                     if (g.debitEntry.get(j).errorType == -1) {
                         System.out.println(g.debitEntry.get(j).content);
                         notFoundG.add(g.debitEntry.get(j));
                     }
                 }
-
+                System.out.println(g.name + " C");
+                for (int j = 0; j < c.debitEntry.size(); j++) {
+                    if (c.debitEntry.get(j).errorType == -1) {
+                        System.out.println(c.debitEntry.get(j).content);
+                        //notFoundG.add(g.debitEntry.get(j));
+                    }
+                }
                 ArrayList<EntryPair> seq = new ArrayList<>();
                 Entry e;
                 EntryPair ep;
@@ -908,7 +914,14 @@ public class ConciliatorV2 {
                         seqAnt = entryContentG[0];
                         temp.add(e);
                         notFoundG.get(j).errorType = 0;
-                        continue;
+                        if(notFoundG.size()==1){
+                            ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
+                             ep.pair.addAll(temp);
+                             seq.add(ep);
+                             break;
+                        }
+                        else
+                            continue;
                     }
                     String[] entryContentG = notFoundG.get(j).content.split(" ");
                     if (Integer.parseInt(entryContentG[0]) == (Integer.parseInt(seqAnt) + 1)) {
