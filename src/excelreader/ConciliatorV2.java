@@ -1077,16 +1077,17 @@ public class ConciliatorV2 {
                             for (int j = 0; j < seq.size(); j++) {
                                 if (seq.get(j).entry.errorType == -1) {
                                     double dif = (Double.parseDouble(v) - Double.parseDouble(seq.get(j).entry.content));
-                                    if (dif < 35 && dif > 0) {
-                                        boolean manut = true;
+                                    System.out.println(seq.get(j).entry.content + " "+ seq.get(j).pair.size());
+                                    if (dif != 0) {
+                                        //boolean manut = true;
+                                        
                                         for (int k = 0; k < seq.get(j).pair.size(); k++) {
                                             String[] entryContentG = seq.get(j).pair.get(k).content.split(" ");
                                             List<String> lg = Arrays.asList(entryContentG);
-                                            if (!lg.contains("00000205")) {
-
-                                                manut = false;
-                                                break;
-                                            }
+                                          //  if (!lg.contains("00000205") || !lg.contains("00000167")) {
+                                          //      manut = false;
+                                          //      break;
+                                         //   }
                                             seq.get(j).entry.errorType = 0;
                                             if (k == 0) {
                                                 p = new Paragraph(new Phrase(lineSpacing, "                   GOSOFT: ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
@@ -1095,12 +1096,12 @@ public class ConciliatorV2 {
                                             p = new Paragraph(new Phrase(lineSpacing, "                   " + seq.get(j).pair.get(k).content, f1));
                                             document.add(p);
                                         }
-                                        if (manut) {
+                                       // if (manut) {
                                             p = new Paragraph(new Phrase(lineSpacing, "                   DIFERENCA: " + round(dif, 2) + " ANUIDADE? ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                             document.add(p);
                                             p = new Paragraph(new Phrase(lineSpacing, "                   ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                             document.add(p);
-                                        }
+                                     //   }
 
                                     }
 
