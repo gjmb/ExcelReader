@@ -650,7 +650,8 @@ public class ConciliatorV2 {
                     p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) BAIXADO(S) NA DATA ERRADA", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                     for (int i = 0; i < checkPairD.size(); i++) {
-                        f1.setColor(BaseColor.DARK_GRAY);
+                        f1.setColor(BaseColor.GRAY);
+                       
                         p = new Paragraph(new Phrase(lineSpacing, "             " + checkPairD.get(i).entry.content, f1));
                         document.add(p);
                         for (int j = 0; j < checkPairD.get(i).pair.size(); j++) {
