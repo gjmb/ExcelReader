@@ -321,7 +321,7 @@ public class TaxExtractor {
                                           //System.out.println(v);
                                          cond.appRescValue.add("-" + v);
                                         continue;
-                                    }
+                                    }   
                                     cond.creditEntry.add(new Entry(lines[j]));
                                     //System.out.println(lines[j]);
                                 } else {

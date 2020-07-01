@@ -190,7 +190,7 @@ public class ConciliatorV2 {
 
     public static void wageFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
         String[] dtW = {""};
-        
+
         //Busca por pagamentos de salario individuais 
         for (int i = 0; i < g.debitEntry.size(); i++) {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
@@ -278,10 +278,10 @@ public class ConciliatorV2 {
 
     }// public static void wageFinder
     //TODO: TESTAR wageFinder
-    
-     public static void advFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
+
+    public static void advFinder(CondominiumG g, Condominium c, double[] wageDif, double[] wage, ArrayList<EntryPair> p) {
         String[] dtW = {""};
-        
+
         //Busca por pagamentos de salario individuais 
         for (int i = 0; i < g.debitEntry.size(); i++) {
             String[] entryContentG = g.debitEntry.get(i).content.split(" ");
@@ -378,7 +378,7 @@ public class ConciliatorV2 {
 
             Document document = new Document(PageSize.A4, 0f, 0f, 0f, 0f);
             float fntSize, lineSpacing;
-            fntSize = 9f;
+            fntSize = 8f;
             lineSpacing = 10f;
 
             try {
@@ -598,6 +598,7 @@ public class ConciliatorV2 {
                                     //   System.out.println("vC: " + vC);
                                     //    System.out.println("entryContent[1]: " + entryContent[1] + " entryContentC[0]: " + entryContentC[0]);
                                     if (vC.equals(dif) && entryContent[0].equals(entryContentC[0])) {
+                                        c.creditEntry.get(k).errorType=0;
                                         if (!findCheckProblem) {
                                             p = new Paragraph(new Phrase(lineSpacing, "                    ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                             document.add(p);
@@ -651,7 +652,7 @@ public class ConciliatorV2 {
                     document.add(p);
                     for (int i = 0; i < checkPairD.size(); i++) {
                         f1.setColor(BaseColor.GRAY);
-                       
+
                         p = new Paragraph(new Phrase(lineSpacing, "             " + checkPairD.get(i).entry.content, f1));
                         document.add(p);
                         for (int j = 0; j < checkPairD.get(i).pair.size(); j++) {
@@ -762,13 +763,13 @@ public class ConciliatorV2 {
                         //System.out.println("wage: " + wage[1]);
                         //System.out.println("wageDif:  " + wageDif[1]);
                     }
-                    
+
                     wageDif[0] = 0;
                     wage[0] = 0;
-                     w = new ArrayList<>();
+                    w = new ArrayList<>();
 
                     advFinder(g, c, wageDif, wage, w);
-                    
+
                     for (int i = 0; i < w.size(); i++) {
                         if (w.get(i).entry.errorType != 0) {
                             if (!findWageProblem) {
@@ -820,7 +821,6 @@ public class ConciliatorV2 {
                             }
 
                             //System.out.println(w.get(i).entry.content + " "+  dt.length + " "+ dt[0]);
-                            
                         }
                         //System.out.println("wage: " + wage[1]);
                         //System.out.println("wageDif:  " + wageDif[1]);
@@ -848,6 +848,34 @@ public class ConciliatorV2 {
                         }
                         //System.out.println(c.debitEntry.get(i).content + " " + c.debitEntry.get(i).errorType);
                         List<String> l = Arrays.asList(entryContent);
+                        boolean findEqualCredit = false;
+                        for (int k = 0; k < c.creditEntry.size(); k++) {
+                            if (c.creditEntry.get(k).errorType == -1) {
+                                String[] entryContentC = c.creditEntry.get(k).content.split(" ");
+                                String vC = entryContentC[entryContentC.length - 2].replace(".", "");
+                                vC = vC.replace(",", ".");
+
+                                if (vC.charAt(vC.length() - 1) == '0') {
+                                    vC = vC.substring(0, vC.length() - 1);
+                                }
+                                //System.out.println(c.debitEntry.get(i).content + " " + c.debitEntry.get(i).errorType);
+                                if (v.equals(vC)) {
+                                    System.out.println(v + " " + vC);
+                                    String[] dtD = entryContent[0].split("/");
+                                    String[] dtC = entryContentC[0].split("/");
+                                    if (dtD[0].equals(dtC[0]) || Integer.parseInt(dtD[0])+1 == Integer.parseInt(dtC[0])) {
+                                        c.debitEntry.get(i).errorType = 0;
+                                        c.creditEntry.get(k).errorType = 0;
+                                        findEqualCredit = true;
+                                        break;
+                                    }
+
+                                }
+                            }
+                        }
+                        if (findEqualCredit) 
+                            continue;
+                        
 
                         for (int j = 0; j < g.debitEntry.size(); j++) {
                             if (g.debitEntry.get(j).errorType == -1) {
@@ -877,6 +905,7 @@ public class ConciliatorV2 {
                                         break;
                                     }
                                 }
+
                             }
                         }//for (int j = 0; j < g.debitEntry.size(); j++) {
                     }//if (c.debitEntry.get(i).errorType == -1)
@@ -915,14 +944,14 @@ public class ConciliatorV2 {
                         seqAnt = entryContentG[0];
                         temp.add(e);
                         notFoundG.get(j).errorType = 0;
-                        if(notFoundG.size()==1){
+                        if (notFoundG.size() == 1) {
                             ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
-                             ep.pair.addAll(temp);
-                             seq.add(ep);
-                             break;
-                        }
-                        else
+                            ep.pair.addAll(temp);
+                            seq.add(ep);
+                            break;
+                        } else {
                             continue;
+                        }
                     }
                     String[] entryContentG = notFoundG.get(j).content.split(" ");
                     if (Integer.parseInt(entryContentG[0]) == (Integer.parseInt(seqAnt) + 1)) {
@@ -951,10 +980,9 @@ public class ConciliatorV2 {
                         ep = new EntryPair(new Entry(Double.toString(round(sumSeq, 2))));
                         ep.pair.addAll(temp);
                         List<String> l = Arrays.asList(temp.get(0).content.split(" "));
-                        
-                            notFoundG.get(j).errorType = 0;
-                            seq.add(ep);
-                        
+
+                        notFoundG.get(j).errorType = 0;
+                        seq.add(ep);
 
                         temp.clear();
                         sumSeq = 0.0;
@@ -972,7 +1000,7 @@ public class ConciliatorV2 {
                     String[] entryContent = notFoundC.get(i).content.split(" ");
                     String v = entryContent[entryContent.length - 2].replace(".", "");
                     v = v.replace(",", ".");
-                   
+
                     if (v.charAt(v.length() - 1) == '0') {
                         v = v.substring(0, v.length() - 1);
                     }
@@ -1067,7 +1095,7 @@ public class ConciliatorV2 {
                         String[] entryContent = notFoundC.get(i).content.split(" ");
                         String v = entryContent[entryContent.length - 2].replace(".", "");
                         v = v.replace(",", ".");
-                       
+
                         if (v.charAt(v.length() - 1) == '0') {
                             v = v.substring(0, v.length() - 1);
                         }
@@ -1078,17 +1106,17 @@ public class ConciliatorV2 {
                             for (int j = 0; j < seq.size(); j++) {
                                 if (seq.get(j).entry.errorType == -1) {
                                     double dif = (Double.parseDouble(v) - Double.parseDouble(seq.get(j).entry.content));
-                                    System.out.println(seq.get(j).entry.content + " "+ seq.get(j).pair.size());
+                                    System.out.println(seq.get(j).entry.content + " " + seq.get(j).pair.size());
                                     if (dif != 0) {
                                         //boolean manut = true;
-                                        
+
                                         for (int k = 0; k < seq.get(j).pair.size(); k++) {
                                             String[] entryContentG = seq.get(j).pair.get(k).content.split(" ");
                                             List<String> lg = Arrays.asList(entryContentG);
-                                          //  if (!lg.contains("00000205") || !lg.contains("00000167")) {
-                                          //      manut = false;
-                                          //      break;
-                                         //   }
+                                            //  if (!lg.contains("00000205") || !lg.contains("00000167")) {
+                                            //      manut = false;
+                                            //      break;
+                                            //   }
                                             seq.get(j).entry.errorType = 0;
                                             if (k == 0) {
                                                 p = new Paragraph(new Phrase(lineSpacing, "                   GOSOFT: ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
@@ -1097,12 +1125,12 @@ public class ConciliatorV2 {
                                             p = new Paragraph(new Phrase(lineSpacing, "                   " + seq.get(j).pair.get(k).content, f1));
                                             document.add(p);
                                         }
-                                       // if (manut) {
-                                            p = new Paragraph(new Phrase(lineSpacing, "                   DIFERENCA: " + round(dif, 2) + " ANUIDADE? ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                                            document.add(p);
-                                            p = new Paragraph(new Phrase(lineSpacing, "                   ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
-                                            document.add(p);
-                                     //   }
+                                        // if (manut) {
+                                        p = new Paragraph(new Phrase(lineSpacing, "                   DIFERENCA: " + round(dif, 2) + " ANUIDADE? ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                        document.add(p);
+                                        p = new Paragraph(new Phrase(lineSpacing, "                   ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                        document.add(p);
+                                        //   }
 
                                     }
 
@@ -1175,13 +1203,12 @@ public class ConciliatorV2 {
                 document.add(p);
                 p = new Paragraph(new Phrase(lineSpacing, "     NOTAS(S)", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                 document.add(p);
-                 p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                 document.add(p);
-                  if(findDifCredit){
+                if (findDifCredit) {
                     p = new Paragraph(new Phrase(lineSpacing, "         *Diferenca entre a soma de todos os creditos encontrados no extrato e todos os creditos encontrados no gosoft", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                     document.add(p);
                 }
-
 
             } catch (DocumentException de) {
                 System.err.println(de.getMessage());
