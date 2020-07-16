@@ -585,7 +585,7 @@ public class ConciliatorV2 {
                                 f1.setColor(BaseColor.BLUE);
                                 p = new Paragraph(new Phrase(lineSpacing, "                 DIFERENCA: " + dif, f1));
                                 document.add(p);
-                            } else if(round(round(checkSum, 2) - round(Double.valueOf(v), 2), 2) < 0){
+                            } else if(round(round(checkSum, 2) - round(Double.valueOf(v), 2), 2) < 0 && round(round(checkSum, 2) - round(Double.valueOf(v), 2), 2) > -5){
                                 if (!findCheckProblem) {
                                     p = new Paragraph(new Phrase(lineSpacing, "                    ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
                                     document.add(p);
