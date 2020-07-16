@@ -585,6 +585,30 @@ public class ConciliatorV2 {
                                 f1.setColor(BaseColor.BLUE);
                                 p = new Paragraph(new Phrase(lineSpacing, "                 DIFERENCA: " + dif, f1));
                                 document.add(p);
+                            } else if(round(round(checkSum, 2) - round(Double.valueOf(v), 2), 2) < 0){
+                                if (!findCheckProblem) {
+                                    p = new Paragraph(new Phrase(lineSpacing, "                    ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                    document.add(p);
+                                    p = new Paragraph(new Phrase(lineSpacing, "     CHEQUES ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                    document.add(p);
+                                    findCheckProblem = true;
+                                }
+                                p = new Paragraph(new Phrase(lineSpacing, "                ", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                document.add(p);
+                                p = new Paragraph(new Phrase(lineSpacing, "         CHEQUE(S) COMPENSADO(S) A MAIOR", FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize)));
+                                document.add(p);
+                                Font f1 = FontFactory.getFont(FontFactory.TIMES_ROMAN, fntSize);
+                                f1.setColor(BaseColor.RED);
+                                p = new Paragraph(new Phrase(lineSpacing, "               " + checkPair.get(i).entry.content, f1));
+                                document.add(p);
+                                for (int j = 0; j < checkPair.get(i).pair.size(); j++) {
+                                    p = new Paragraph(new Phrase(lineSpacing, "                 " + checkPair.get(i).pair.get(j).content, f1));
+                                    document.add(p);
+                                }
+                                f1.setColor(BaseColor.BLUE);
+                                p = new Paragraph(new Phrase(lineSpacing, "                 DIFERENCA: " + dif, f1));
+                                document.add(p);                      
+                            
                             } else {
                                 dif = dif.replace("-", "");
                                 // System.out.println("Dif: " + dif);
