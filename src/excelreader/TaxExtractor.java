@@ -229,7 +229,7 @@ public class TaxExtractor {
                                     
                                    // TODO: VERIFICAR ESTORNO DE APLICACAO 
                                     
-                                } else if (lineList.contains(retrieve[0]) || lineList.contains(retrieve[1]) || lineList.contains(retrieve[2])) {
+                                } else if ((lineList.contains(retrieve[0]) || lineList.contains(retrieve[1]) || lineList.contains(retrieve[2])) && !lineList.contains("POUPANCA*")) {
                                     cond.appRescDate.add(lineSplited[0]);
                                     String v = lineSplited[lineSplited.length - 2];
                                     cond.appRescValue.add("-" + v);
@@ -295,7 +295,7 @@ public class TaxExtractor {
 
                                 //System.out.println(lines[j]);
                                 //resgate: valor negativo
-                            } else if (lineList.contains(retrieve[0]) || lineList.contains(retrieve[1]) || lineList.contains(retrieve[2])) {
+                            } else if ((lineList.contains(retrieve[0]) || lineList.contains(retrieve[1]) || lineList.contains(retrieve[2])) && !lineList.contains("POUPANCA*")) {
                                 cond.appRescDate.add(lineSplited[0]);
                                 String v = lineSplited[lineSplited.length - 2];
                                 //System.out.println(v);
